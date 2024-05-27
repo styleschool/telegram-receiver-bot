@@ -16,22 +16,6 @@ function sendMessageWithOptions(chatId, message, options) {
 
 const welcomeMessage = `Здравствуйте. Я бот Высшей школы стилистики, дизайна и технологий! Я готов предоставить вам информацию о наших курсах и вариантах обучения. Также я могу перевести вас на другого бота, где вы можете бесплатно проходить обучение.`;
 
-// // Matches any message
-// bot.on('message', (msg) => {
-//     const chatId = msg.chat.id;
-
-//     // Send back 'Hello, World!' to the sender
-//     bot.sendMessage(chatId, welcomeMessage);
-// });
-
-// // Handle callback queries
-// bot.on('callback_query', (callbackQuery) => {
-//   const message = callbackQuery.message;
-//   const data = callbackQuery.data;
-
-//   // bot.sendMessage(message.chat.id, `You selected option ${data}`);
-// });
-
 const steps = {
   "step.1": (chatId) => {
     sendMessageWithOptions(chatId, 'Как я могу быть вам полезен?', [
