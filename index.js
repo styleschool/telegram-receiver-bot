@@ -236,6 +236,7 @@ async function getRow(userId) {
       return null;
     }
 
+    console.log(rows);
     const userRow = rows.find(row => row[0] === userId);
 
     if (!userRow) {
