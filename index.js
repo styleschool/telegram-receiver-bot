@@ -87,12 +87,12 @@ const steps = {
       { text: 'Выбрать другой курс', callback_data: 'step.3' },
     ]);
   },
-  "block.2": (chatId, userId) => {
+  "block.2": async (chatId, userId) => {
     if (!userId) {
       return;
     }
 
-    const user = getRow(userId);
+    const user = await getRow(userId);
     console.log({ user });
 
     if (user?.fullName) {
@@ -148,12 +148,12 @@ bot.onText(/\/start/, (msg) => {
   });
 });
 
-bot.on('callback_query', (callbackQuery) => {
+bot.on('callback_query', async (callbackQuery) => {
   const message = callbackQuery.message;
   const data = callbackQuery.data;
   const handler = steps[data];
   if (handler) {
-    handler(message.chat.id, callbackQuery.from.id);
+    await handler(message.chat.id, callbackQuery.from.id);
   }
 });
 
