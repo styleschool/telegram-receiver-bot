@@ -123,20 +123,7 @@ bot.on('message', async (msg) => {
     const text = msg.text;
 
     if (chats?.[chatId]?.state === 'entering-name') {
-      let user;
-      if (userId) {
-        getRow(userId);
-      }
-      if (user) {
-        user.fullName = text;
-        await updateRow(user);
-      } else {
-        user = {
-          userId,
-          fullName: text,
-        }
-        await addRow(user);
-      }
+      await updateOrAddRow({ userId, fullName: text });
       bot.sendMessage(chatId, `Спасибо! В ближайшее время с Вами свяжутся`);
     }
 });
@@ -295,6 +282,60 @@ async function updateRow(user) {
     console.log('Row updated:', updateResponse.data);
   } catch (error) {
     console.error('Error updating row: ', error);
+  }
+}
+
+// Function to update or add a user by userId
+async function updateOrAddRow(user) {
+  const range = 'Users!A:D'; // Adjust range to include columns for user data
+
+  try {
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range,
+    });
+
+    const rows = response.data.values;
+
+    if (rows.length === 0) {
+      console.log('No data found. Adding the first row.');
+    }
+
+    // Find the index of the row to update
+    const rowIndex = rows ? rows.findIndex(row => row[0] === user.userId) : -1;
+
+    if (rowIndex !== -1) {
+      // Update existing user
+      const targetRange = `Users!A${rowIndex + 1}:D${rowIndex + 1}`; // Calculate the range for the specific row
+      const values = [[user.userId, user.fullName]];
+      const resource = { values };
+
+      const updateResponse = await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: targetRange,
+        valueInputOption: 'RAW',
+        resource,
+      });
+
+      console.log('Row updated:', updateResponse.data);
+    } else {
+      // Add new user if not found
+      const values = [
+        [user.userId, user.fullName]
+      ];
+      const resource = { values };
+
+      const appendResponse = await sheets.spreadsheets.values.append({
+        spreadsheetId,
+        range,
+        valueInputOption: 'RAW',
+        resource,
+      });
+
+      console.log('Row added:', appendResponse.data);
+    }
+  } catch (error) {
+    console.error('Error updating or adding row: ', error);
   }
 }
 
