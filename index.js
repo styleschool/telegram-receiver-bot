@@ -106,11 +106,6 @@
 console.log("Bot is running...");
 
 const { google } = require('googleapis');
-const fs = require('fs');
-const path = require('path');
-
-// Load the service account credentials
-// const credentials = require('./path-to-your-credentials.json');
 
 // Function to insert a row using Google Sheets API
 async function addRow(auth) {
@@ -140,7 +135,40 @@ async function addRow(auth) {
   }
 }
 
-// Authorize and call the function
+// Function to ensure the first two cells in the Users sheet are 'userId' and 'fullName'
+async function ensureFirstRow(auth) {
+  const sheets = google.sheets({ version: 'v4', auth });
+  const spreadsheetId = '1_7bWQgcDmd0o6jr7rvYGSoedAmYJ7IbZFV4tOJXOB_I'; // Replace with your spreadsheet ID
+  const range = 'Users!A1:B1';
+
+  try {
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range,
+    });
+
+    const values = response.data.values;
+    if (!values || values.length === 0 || values[0].length < 2) {
+      await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range,
+        valueInputOption: 'RAW',
+        resource: {
+          values: [['userId', 'fullName']],
+        },
+      });
+      console.log('First row updated to "userId" and "fullName".');
+    } else if (values[0][0] !== 'userId' || values[0][1] !== 'fullName') {
+      throw new Error('First two cells in the first row do not match "userId" and "fullName".');
+    } else {
+      console.log('First row is already set to "userId" and "fullName".');
+    }
+  } catch (error) {
+    console.error('Error ensuring first row: ', error);
+  }
+}
+
+// Authorize and call the functions
 async function main() {
   const auth = new google.auth.GoogleAuth({
     keyFile: './google-api.json',
@@ -148,7 +176,9 @@ async function main() {
   });
 
   const authClient = await auth.getClient();
-  addRow(authClient);
+
+  await ensureFirstRow(authClient);
+  await addRow(authClient);
 }
 
 main();
