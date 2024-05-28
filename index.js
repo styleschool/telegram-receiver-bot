@@ -1,107 +1,160 @@
-// const fs = require('fs');
-// const TelegramBot = require('node-telegram-bot-api');
+const fs = require('fs');
+const TelegramBot = require('node-telegram-bot-api');
 
-// const token = fs.readFileSync('token', 'utf8').trim();
-// const bot = new TelegramBot(token, { polling: true });
+const token = fs.readFileSync('token', 'utf8').trim();
+const bot = new TelegramBot(token, { polling: true });
 
-// function sendMessageWithOptions(chatId, message, options) {
-//   const inlineKeyboard = options.map(option => [{ text: option.text, callback_data: option.callback_data }]);
+function sendMessageWithOptions(chatId, message, options) {
+  const inlineKeyboard = options.map(option => [{ text: option.text, callback_data: option.callback_data }]);
 
-//   bot.sendMessage(chatId, message, {
-//     reply_markup: {
-//       inline_keyboard: inlineKeyboard
-//     }
-//   });
-// }
+  bot.sendMessage(chatId, message, {
+    reply_markup: {
+      inline_keyboard: inlineKeyboard
+    }
+  });
+}
 
-// const welcomeMessage = `Здравствуйте. Я бот Высшей школы стилистики, дизайна и технологий! Я готов предоставить вам информацию о наших курсах и вариантах обучения. Также я могу перевести вас на другого бота, где вы можете бесплатно проходить обучение.`;
+const welcomeMessage = `Здравствуйте. Я бот Высшей школы стилистики, дизайна и технологий! Я готов предоставить вам информацию о наших курсах и вариантах обучения. Также я могу перевести вас на другого бота, где вы можете бесплатно проходить обучение.`;
 
-// const steps = {
-//   "step.1": (chatId) => {
-//     sendMessageWithOptions(chatId, 'Как я могу быть вам полезен?', [
-//       { text: 'Информация о курсах', callback_data: 'step.2' },
-//       { text: 'Оставить заявку для связи', callback_data: '...' },
-//       { text: 'Хочу учиться бесплатно!', callback_data: 'step.3' }
-//     ]);
-//   },
-//   "step.2": (chatId) => {
-//     sendMessageWithOptions(chatId, 'У нас есть следующие варианты обучения:', [
-//       { text: 'Платные программы', callback_data: 'step.2.paid-courses' },
-//       { text: 'Бесплатные программы', callback_data: 'step.3' },
-//       { text: 'Назад', callback_data: 'step.1' },
-//       { text: 'Бесплатные в рамках программы Содействие занятости', callback_data: 'step.4' },
-//     ]);
-//   },
-//   "step.2.paid-courses": (chatId) => {
-//     sendMessageWithOptions(chatId, 'Выберите платный курс:', [
-//       { text: '1. НЕЙРОСЕТИ ДЛЯ ДИЗАЙНЕРОВ И СТИЛИСТОВ', callback_data: 'step.2.paid-courses.1' },
-//     ]);
-//   },
-//   "step.2.paid-courses.1": (chatId) => {
-//     bot.sendMessage(chatId, `
-//     Авторский курс Анны Клименкоди - это практика использования актуальных нейросетей в профессиональной деятельности дизайнеров и стилистов. Курс включает инструкции по работе с инструментами искусственного интеллекта с учетом последних обновлений, и доступен для обучения с “нуля”.
+const chats = {};
 
-//     Профессия: контент менеджер, промпт инженер
+const steps = {
+  "step.1": (chatId) => {
+    sendMessageWithOptions(chatId, 'Как я могу быть вам полезен?', [
+      { text: 'Информация о курсах', callback_data: 'step.2' },
+      { text: 'Оставить заявку для связи', callback_data: '...' },
+      { text: 'Хочу учиться бесплатно!', callback_data: 'step.3' }
+    ]);
+  },
+  "step.2": (chatId) => {
+    sendMessageWithOptions(chatId, 'У нас есть следующие варианты обучения:', [
+      { text: 'Платные программы', callback_data: 'step.2.paid-courses' },
+      { text: 'Бесплатные программы', callback_data: 'step.3' },
+      { text: 'Назад', callback_data: 'step.1' },
+      { text: 'Бесплатные в рамках программы Содействие занятости', callback_data: 'step.4' },
+    ]);
+  },
+  "step.2.paid-courses": (chatId) => {
+    sendMessageWithOptions(chatId, 'Выберите платный курс:', [
+      { text: '1. НЕЙРОСЕТИ ДЛЯ ДИЗАЙНЕРОВ И СТИЛИСТОВ', callback_data: 'step.2.paid-courses.1' },
+    ]);
+  },
+  "step.2.paid-courses.1": (chatId) => {
+    bot.sendMessage(chatId, `
+    Авторский курс Анны Клименкоди - это практика использования актуальных нейросетей в профессиональной деятельности дизайнеров и стилистов. Курс включает инструкции по работе с инструментами искусственного интеллекта с учетом последних обновлений, и доступен для обучения с “нуля”.
 
-//     Доступно полностью дистанционное (онлайн) обучение
+    Профессия: контент менеджер, промпт инженер
 
-//     Длительность: 12 недель, 72 академических часа
-//     Полная стоимость курса: 50 тыс. рублей, доступна рассрочка
+    Доступно полностью дистанционное (онлайн) обучение
 
-//     Подробнее: https://styleschool.ru/education/nn-for-designers-and-stylists
-// `);
-//     sendMessageWithOptions(chatId, 'Хотите начать обучение по этой программе?', [
-//       { text: 'Да', callback_data: 'block.2' },
-//       { text: 'Нет', callback_data: 'step.1' },
-//       { text: 'Выбрать другой курс', callback_data: 'step.2.paid-courses' },
-//     ]);
-//   },
-//   "step.3": (chatId) => {
-//     sendMessageWithOptions(chatId, 'Выберите бесплатный курс:', [
-//       { text: '1. КОНСУЛЬТАНТ ПО СТИЛЮ', callback_data: 'step.3.free-courses.1' },
-//     ]);
-//   },
-//   "step.3.free-courses.1": (chatId) => {
-//     bot.sendMessage(chatId, `
-//     Курс создан для обучения с “нуля”. Дает возможность реализовать мечту о творческой самореализации в области моды и сделать первые шаги в профессии стилиста. В курсе представлены базовые методики в области подбора комплектов одежды в соответствии с индивидуальными особенностями персон и модными тенденциями. Гибкий график изучения видео материалов в сочетании с живыми практическими занятиями и командной работой дает гарантированный результат.
+    Длительность: 12 недель, 72 академических часа
+    Полная стоимость курса: 50 тыс. рублей, доступна рассрочка
 
-//     Направления в профессии: имидж-консультант, консультант по стилю, персональный стилист, шопер, продавец-стилист.
+    Подробнее: https://styleschool.ru/education/nn-for-designers-and-stylists
+`);
+    sendMessageWithOptions(chatId, 'Хотите начать обучение по этой программе?', [
+      { text: 'Да', callback_data: 'block.2' },
+      { text: 'Нет', callback_data: 'step.1' },
+      { text: 'Выбрать другой курс', callback_data: 'step.2.paid-courses' },
+    ]);
+  },
+  "step.3": (chatId) => {
+    sendMessageWithOptions(chatId, 'Выберите бесплатный курс:', [
+      { text: '1. КОНСУЛЬТАНТ ПО СТИЛЮ', callback_data: 'step.3.free-courses.1' },
+    ]);
+  },
+  "step.3.free-courses.1": (chatId) => {
+    bot.sendMessage(chatId, `
+    Курс создан для обучения с “нуля”. Дает возможность реализовать мечту о творческой самореализации в области моды и сделать первые шаги в профессии стилиста. В курсе представлены базовые методики в области подбора комплектов одежды в соответствии с индивидуальными особенностями персон и модными тенденциями. Гибкий график изучения видео материалов в сочетании с живыми практическими занятиями и командной работой дает гарантированный результат.
 
-//     Доступно полностью дистанционное (онлайн) обучение
-//     Доступно комбинированное обучение с очными практиками
+    Направления в профессии: имидж-консультант, консультант по стилю, персональный стилист, шопер, продавец-стилист.
 
-//     Длительность: 8 недель, 144 академических часов.
-//     Полная стоимость курса:
-//     онлайн формат - 40 тыс. рублей, доступна рассрочка
-//     комбинированный формат (онлайн + очные практики) - 69 тыс. рублей, доступна рассрочка *
-//     cтоимость обучения в рамках федерального проекта “Содействие занятости” - 0 рублей. **
+    Доступно полностью дистанционное (онлайн) обучение
+    Доступно комбинированное обучение с очными практиками
 
-//     * Очные практики доступны по региону: Москва, Новосибирск
-//     ** Данное обучение доступно для определенных категорий граждан РФ.
-// `);
-//     sendMessageWithOptions(chatId, 'Хотите начать обучение по этой программе?', [
-//       { text: 'Да', callback_data: 'block.2' },
-//       { text: 'Нет', callback_data: 'step.1' },
-//       { text: 'Выбрать другой курс', callback_data: 'step.3' },
-//     ]);
-//   },
-// };
+    Длительность: 8 недель, 144 академических часов.
+    Полная стоимость курса:
+    онлайн формат - 40 тыс. рублей, доступна рассрочка
+    комбинированный формат (онлайн + очные практики) - 69 тыс. рублей, доступна рассрочка *
+    cтоимость обучения в рамках федерального проекта “Содействие занятости” - 0 рублей. **
 
-// bot.onText(/\/start/, (msg) => {
-//   const chatId = msg.chat.id;
-//   bot.sendMessage(chatId, welcomeMessage).then(() => {
-//     steps['step.1'](chatId);
-//   });
-// });
+    * Очные практики доступны по региону: Москва, Новосибирск
+    ** Данное обучение доступно для определенных категорий граждан РФ.
+`);
+    sendMessageWithOptions(chatId, 'Хотите начать обучение по этой программе?', [
+      { text: 'Да', callback_data: 'block.2' },
+      { text: 'Нет', callback_data: 'step.1' },
+      { text: 'Выбрать другой курс', callback_data: 'step.3' },
+    ]);
+  },
+  "block.2": (chatId, userId) => {
+    if (!userId) {
+      return;
+    }
 
-// bot.on('callback_query', (callbackQuery) => {
-//   const message = callbackQuery.message;
-//   const data = callbackQuery.data;
-//   const handler = steps[data];
-//   if (handler) {
-//     handler(message.chat.id);
-//   }
-// });
+    const user = getRow(userId);
+
+    if (user && user.fullName) {
+      sendMessageWithOptions(chatId, `Вы ${user.fullName}?`, [
+        { text: 'Да', callback_data: 'block.2.form-complete' },
+        { text: 'Нет', callback_data: 'block.2.enter-name' },
+      ]);
+    } else {
+      bot.sendMessage(chatId, `Как к вам обращаться?`);
+      chats[chatId] ??= {};
+      chats[chatId].state = 'entering-name';
+    }
+  },
+  "block.2.form-complete": (chatId) => {
+    bot.sendMessage(chatId, `Спасибо! В ближайшее время с Вами свяжутся`);
+  },
+  "block.2.enter-name": (chatId) => {
+    bot.sendMessage(chatId, `Как к вам обращаться?`);
+    chats[chatId] ??= {};
+    chats[chatId].state = 'entering-name';
+  },
+};
+
+// Matches any message
+bot.on('message', async (msg) => {
+    const chatId = msg.chat.id;
+    const userId = msg.from.id;
+    const text = msg.text;
+
+    if (chats?.[chatId]?.state === 'entering-name') {
+      let user;
+      if (userId) {
+        getRow(userId);
+      }
+      if (user) {
+        user.fullName = text;
+        await updateRow(user);
+      } else {
+        user = {
+          userId,
+          fullName: text,
+        }
+        await addRow(user);
+      }
+      bot.sendMessage(chatId, `Спасибо! В ближайшее время с Вами свяжутся`);
+    }
+});
+
+bot.onText(/\/start/, (msg) => {
+  const chatId = msg.chat.id;
+  bot.sendMessage(chatId, welcomeMessage).then(() => {
+    steps['step.1'](chatId);
+  });
+});
+
+bot.on('callback_query', (callbackQuery) => {
+  const message = callbackQuery.message;
+  const data = callbackQuery.data;
+  const handler = steps[data];
+  if (handler) {
+    handler(message.chat.id, callbackQuery.from.id);
+  }
+});
 
 console.log("Bot is running...");
 
@@ -199,6 +252,50 @@ async function getRow(userId) {
   }
 }
 
+// Function to update a user by userId
+async function updateRow(user) {
+  const range = 'Users!A:D'; // Adjust range to include columns for user data
+
+  try {
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range,
+    });
+
+    const rows = response.data.values;
+    if (rows.length === 0) {
+      console.log('No data found.');
+      return;
+    }
+
+    const rowIndex = rows.findIndex(row => row[0] === user.userId);
+    if (rowIndex === -1) {
+      console.log('User not found.');
+      return;
+    }
+
+    const targetRange = `Users!A${rowIndex + 1}:D${rowIndex + 1}`; // Calculate the range for the specific row
+
+    const values = [
+      [user.userId, user.fullName]
+    ];
+    const resource = {
+      values,
+    };
+
+    const updateResponse = await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: targetRange,
+      valueInputOption: 'RAW',
+      resource,
+    });
+
+    console.log('Row updated:', updateResponse.data);
+  } catch (error) {
+    console.error('Error updating row: ', error);
+  }
+}
+
 // Authorize and call the functions
 async function main() {
   const auth = new google.auth.GoogleAuth({
@@ -211,11 +308,11 @@ async function main() {
 
   await ensureFirstRow();
 
-  const user = { userId: '123', fullName: 'John Doe' };
-  await addRow(user);
+  // const user = { userId: '123', fullName: 'John Doe' };
+  // await addRow(user);
 
-  const retrievedUser = await getRow('123');
-  console.log('Retrieved User:', retrievedUser);
+  // const retrievedUser = await getRow('123');
+  // console.log('Retrieved User:', retrievedUser);
 }
 
 main();
