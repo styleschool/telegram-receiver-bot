@@ -303,7 +303,7 @@ async function updateOrAddRow(user) {
     }
 
     // Find the index of the row to update
-    const rowIndex = rows ? rows.findIndex(row => row[0] === user.userId) : -1;
+    const rowIndex = rows ? rows.findIndex(row => row[0] == user.userId) : -1;
 
     if (rowIndex !== -1) {
       // Update existing user
