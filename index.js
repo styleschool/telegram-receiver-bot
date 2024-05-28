@@ -94,7 +94,7 @@ const steps = {
 
     const user = getRow(userId);
 
-    if (user && user.fullName) {
+    if (user?.fullName) {
       sendMessageWithOptions(chatId, `Вы ${user.fullName}?`, [
         { text: 'Да', callback_data: 'block.2.form-complete' },
         { text: 'Нет', callback_data: 'block.2.enter-name' },
