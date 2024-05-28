@@ -22,7 +22,7 @@ const steps = {
   "step.1": (chatId) => {
     sendMessageWithOptions(chatId, 'Как я могу быть вам полезен?', [
       { text: 'Информация о курсах', callback_data: 'step.2' },
-      { text: 'Оставить заявку для связи', callback_data: '...' },
+      { text: 'Оставить заявку для связи', callback_data: 'block.2' },
       { text: 'Хочу учиться бесплатно!', callback_data: 'step.3' }
     ]);
   },
