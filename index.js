@@ -93,6 +93,7 @@ const steps = {
     }
 
     const user = getRow(userId);
+    console.log({ user });
 
     if (user?.fullName) {
       sendMessageWithOptions(chatId, `Вы ${user.fullName}?`, [
