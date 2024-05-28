@@ -237,7 +237,7 @@ async function getRow(userId) {
     }
 
     console.log(rows);
-    const userRow = rows.find(row => row[0] === userId);
+    const userRow = rows.find(row => row[0] == userId);
 
     if (!userRow) {
       console.log('User not found.');
