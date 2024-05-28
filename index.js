@@ -125,6 +125,7 @@ bot.on('message', async (msg) => {
     if (chats?.[chatId]?.state === 'entering-name') {
       await updateOrAddRow({ userId, fullName: text });
       bot.sendMessage(chatId, `Спасибо! В ближайшее время с Вами свяжутся`);
+      delete chats?.[chatId]?.state;
     }
 });
 
