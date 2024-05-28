@@ -106,16 +106,16 @@
 console.log("Bot is running...");
 
 const { google } = require('googleapis');
+const spreadsheetId = '1_7bWQgcDmd0o6jr7rvYGSoedAmYJ7IbZFV4tOJXOB_I'; // Replace with your spreadsheet ID
+let sheets; // Global variable for Google Sheets API client
 
 // Function to insert a row using Google Sheets API
-async function addRow(auth) {
-  const sheets = google.sheets({ version: 'v4', auth });
-  const spreadsheetId = '1_7bWQgcDmd0o6jr7rvYGSoedAmYJ7IbZFV4tOJXOB_I'; // Replace with your spreadsheet ID
-  const range = 'Users!A1:D1'; // Replace with the range where you want to insert data
+async function addRow(user) {
+  const range = 'Users!A:D'; // Adjust the range to include the entire columns needed
   const valueInputOption = 'RAW';
 
   const values = [
-    ["Value A1", "Value B1", "Value C1", "Value D1"]
+    [user.userId, user.fullName]
   ];
   const resource = {
     values,
@@ -136,9 +136,7 @@ async function addRow(auth) {
 }
 
 // Function to ensure the first two cells in the Users sheet are 'userId' and 'fullName'
-async function ensureFirstRow(auth) {
-  const sheets = google.sheets({ version: 'v4', auth });
-  const spreadsheetId = '1_7bWQgcDmd0o6jr7rvYGSoedAmYJ7IbZFV4tOJXOB_I'; // Replace with your spreadsheet ID
+async function ensureFirstRow() {
   const range = 'Users!A1:B1';
 
   try {
@@ -168,6 +166,39 @@ async function ensureFirstRow(auth) {
   }
 }
 
+// Function to get a user by userId
+async function getRow(userId) {
+  const range = 'Users!A:D'; // Adjust range to include columns for user data
+
+  try {
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range,
+    });
+
+    const rows = response.data.values;
+
+    if (rows.length === 0) {
+      console.log('No data found.');
+      return null;
+    }
+
+    const userRow = rows.find(row => row[0] === userId);
+
+    if (!userRow) {
+      console.log('User not found.');
+      return null;
+    }
+
+    return {
+      userId: userRow[0],
+      fullName: userRow[1],
+    };
+  } catch (error) {
+    console.error('Error getting row: ', error);
+  }
+}
+
 // Authorize and call the functions
 async function main() {
   const auth = new google.auth.GoogleAuth({
@@ -176,9 +207,15 @@ async function main() {
   });
 
   const authClient = await auth.getClient();
+  sheets = google.sheets({ version: 'v4', auth: authClient });
 
-  await ensureFirstRow(authClient);
-  await addRow(authClient);
+  await ensureFirstRow();
+
+  const user = { userId: '123', fullName: 'John Doe' };
+  await addRow(user);
+
+  const retrievedUser = await getRow('123');
+  console.log('Retrieved User:', retrievedUser);
 }
 
 main();
