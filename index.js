@@ -328,8 +328,8 @@ async function ensureUsersSheet() {
       spreadsheetId,
     });
 
-    const sheets = sheetExists.data.sheets.map(sheet => sheet.properties.title);
-    if (!sheets.includes(sheetTitle)) {
+    const documentSheets = sheetExists.data.sheets.map(sheet => sheet.properties.title);
+    if (!documentSheets.includes(sheetTitle)) {
       await sheets.spreadsheets.batchUpdate({
         spreadsheetId,
         resource: {
