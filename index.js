@@ -392,8 +392,8 @@ async function applyMigrations() {
       console.log('First migration is already set to "userId" and "fullName".');
     }
 
-    // Apply migration for version 2 (adding userName field)
-    if (values[0].length < 3 || values[0][1] !== 'userName' || values[0][2] !== 'fullName') {
+    // Apply migration for version 2 (adding userLink and userLink fields)
+    if (values[0].length < 4 || values[0][1] !== 'userName' || values[0][2] !== 'userLink' || values[0][3] !== 'fullName') {
       const responseAll = await sheets.spreadsheets.values.get({
         spreadsheetId,
         range: 'Users!A1:B',
@@ -401,24 +401,25 @@ async function applyMigrations() {
 
       const allValues = responseAll.data.values;
       const newValues = allValues.map((row, index) => [
-        row[0] || null, // userId
-        null, // userName (new field left empty)
-        row[1] || null, // fullName moved to the third column
+        row[0] || null,  // userId
+        null,  // userName (new field left empty)
+        null,  // userLink (new field left empty)
+        row[1] || null,  // fullName moved to the fourth column
       ]);
 
       await sheets.spreadsheets.values.update({
         spreadsheetId,
-        range: 'Users!A1:C1',
+        range: 'Users!A1:D',
         valueInputOption: 'RAW',
         resource: {
-          values: [['userId', 'userName', 'fullName']],
+          values: [['userId', 'userName', 'userLink', 'fullName']],
         },
       });
 
       if (newValues.length > 1) { // Ensure there's data beyond the header row
         await sheets.spreadsheets.values.update({
           spreadsheetId,
-          range: 'Users!A2:C',
+          range: 'Users!A2:D',
           valueInputOption: 'RAW',
           resource: {
             values: newValues.slice(1), // exclude header row
@@ -436,9 +437,9 @@ async function applyMigrations() {
         });
       }
 
-      console.log('Second migration applied, moved "fullName" to new position and added "userName" field.');
+      console.log('Second migration applied, moved "fullName" to new position and added "userLink" field.');
     } else {
-      console.log('Second migration is already set to "userId", "userName", and "fullName".');
+      console.log('Second migration is already set to "userId", "userName", "userLink", and "fullName".');
     }
   } catch (error) {
     console.error('Error applying migrations: ', error);
