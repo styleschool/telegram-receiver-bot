@@ -351,7 +351,7 @@ async function ensureUsersSheet() {
   }
 }
 
-// Function to ensure the first two cells in the Users sheet are 'userId' and 'fullName'
+// Function to apply migrations
 async function applyMigrations() {
   const range = 'Users!A1:C1';
 
@@ -377,24 +377,54 @@ async function applyMigrations() {
         },
       });
       console.log('First migration applied, set to "userId" and "fullName".');
-    } else if (values[0][0] !== 'userId' || values[0][1] !== 'fullName') {
-      throw new Error('First two cells in the first row do not match "userId" and "fullName".');
+    } else if (values[0].length == 2 && (values[0][0] !== 'userId' || values[0][1] !== 'fullName')) {
+      console.warn('First row does not match "userId" and "fullName". Attempting to fix...');
+      await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: 'Users!A1:B1',
+        valueInputOption: 'RAW',
+        resource: {
+          values: [['userId', 'fullName']],
+        },
+      });
+      console.log('First row updated to "userId" and "fullName".');
     } else {
       console.log('First migration is already set to "userId" and "fullName".');
     }
 
     // Apply migration for version 2 (adding userName field)
     if (values[0].length < 3 || values[0][1] !== 'userName' || values[0][2] !== 'fullName') {
-      const newValues = [['userId', 'userName', 'fullName']];
+      const responseAll = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: 'Users!A1:C',
+      });
+
+      const allValues = responseAll.data.values;
+      const newValues = allValues.map(row => [
+        row[0] || null, // userId
+        null, // userName (new field left empty)
+        row[1] || null, // fullName moved to the third column
+      ]);
+
       await sheets.spreadsheets.values.update({
         spreadsheetId,
-        range,
+        range: 'Users!A1:C1',
         valueInputOption: 'RAW',
         resource: {
-          values: newValues,
+          values: [['userId', 'userName', 'fullName']],
         },
       });
-      console.log('Second migration applied, set to "userId", "userName", and "fullName".');
+
+      await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: 'Users!A2:C',
+        valueInputOption: 'RAW',
+        resource: {
+          values: newValues.slice(1), // exclude header row
+        },
+      });
+
+      console.log('Second migration applied, moved "fullName" to new position and added "userName" field.');
     } else {
       console.log('Second migration is already set to "userId", "userName", and "fullName".');
     }
