@@ -14,6 +14,18 @@ function sendMessageWithOptions(chatId, message, options) {
   });
 }
 
+// Define a global metadata object
+const metadata = {
+  users: {
+    columns: {
+      userId: 0, // Default initial values, will be updated by migration
+      userName: 1,
+      userLink: 2,
+      fullName: 3,
+    },
+  },
+};
+
 const chats = {};
 
 const introductionMessage = `Как я могу к Вам обращаться?`;
@@ -93,7 +105,7 @@ const steps = {
       return;
     }
 
-    const user = await getRow(userId);
+    const user = await getUserRow(userId);
     console.log({ user });
 
     if (user?.fullName) {
@@ -194,7 +206,7 @@ const steps = {
 //       return;
 //     }
 
-//     const user = await getRow(userId);
+//     const user = await getUserRow(userId);
 //     console.log({ user });
 
 //     if (user?.fullName) {
@@ -437,9 +449,25 @@ async function applyMigrations() {
         });
       }
 
-      console.log('Second migration applied, moved "fullName" to new position and added "userLink" field.');
+      // Update metadata
+      metadata.users.columns = {
+        userId: 0,
+        userName: 1,
+        userLink: 2,
+        fullName: 3,
+      };
+
+      console.log('Second migration applied, moved "fullName" to new position and added "userLink" field. Metadata updated.');
     } else {
-      console.log('Second migration is already set to "userId", "userName", "userLink", and "fullName".');
+      console.log('Second migration is already set to "userId", "userName", "userLink", and "fullName". Metadata updated.');
+      
+      // Ensure metadata is up to date even if migration was not applied
+      metadata.users.columns = {
+        userId: 0,
+        userName: 1,
+        userLink: 2,
+        fullName: 3,
+      };
     }
   } catch (error) {
     console.error('Error applying migrations: ', error);
@@ -452,7 +480,7 @@ async function ensureMigrations() {
 }
 
 // Function to get a user by userId
-async function getRow(userId) {
+async function getUserRow(userId) {
   const range = 'Users!A:D'; // Adjust range to include columns for user data
 
   try {
@@ -469,7 +497,7 @@ async function getRow(userId) {
     }
 
     console.log(rows);
-    const userRow = rows.find(row => row[0] == userId);
+    const userRow = rows.find(row => row[metadata.users.columns.userId] == userId);
 
     if (!userRow) {
       console.log('User not found.');
@@ -477,8 +505,10 @@ async function getRow(userId) {
     }
 
     return {
-      userId: userRow[0],
-      fullName: userRow[1],
+      userId: userRow[metadata.users.columns.userId],
+      userName: userRow[metadata.users.columns.userName],
+      userLink: userRow[metadata.users.columns.userLink],
+      fullName: userRow[metadata.users.columns.fullName],
     };
   } catch (error) {
     console.error('Error getting row: ', error);
@@ -601,6 +631,6 @@ async function updateOrAddRow(user) {
   // const user = { userId: '123', fullName: 'John Doe' };
   // await addRow(user);
 
-  // const retrievedUser = await getRow('123');
+  // const retrievedUser = await getUserRow('123');
   // console.log('Retrieved User:', retrievedUser);
 })();
