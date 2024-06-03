@@ -431,7 +431,7 @@ async function applyMigrations() {
           range: 'Users!B2:B',
           valueInputOption: 'RAW',
           resource: {
-            values: Array(newValues.length - 1).fill([null]),
+            values: Array(newValues.length - 1).fill(['']),
           },
         });
       }
