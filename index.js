@@ -14,135 +14,143 @@ function sendMessageWithOptions(chatId, message, options) {
   });
 }
 
-const welcomeMessage = `Здравствуйте. Я бот Высшей школы стилистики, дизайна и технологий! Я готов предоставить вам информацию о наших курсах и вариантах обучения. Также я могу перевести вас на другого бота, где вы можете бесплатно проходить обучение.`;
-
 const chats = {};
 
-const steps = {
-  "step.1": (chatId) => {
-    sendMessageWithOptions(chatId, 'Как я могу быть вам полезен?', [
-      { text: 'Информация о курсах', callback_data: 'step.2' },
-      { text: 'Оставить заявку для связи', callback_data: 'block.2' },
-      { text: 'Хочу учиться бесплатно!', callback_data: 'step.3' }
-    ]);
-  },
-  "step.2": (chatId) => {
-    sendMessageWithOptions(chatId, 'У нас есть следующие варианты обучения:', [
-      { text: 'Платные программы', callback_data: 'step.2.paid-courses' },
-      { text: 'Бесплатные программы', callback_data: 'step.3' },
-      { text: 'Назад', callback_data: 'step.1' },
-      { text: 'Бесплатные в рамках программы Содействие занятости', callback_data: 'step.4' },
-    ]);
-  },
-  "step.2.paid-courses": (chatId) => {
-    sendMessageWithOptions(chatId, 'Выберите платный курс:', [
-      { text: '1. НЕЙРОСЕТИ ДЛЯ ДИЗАЙНЕРОВ И СТИЛИСТОВ', callback_data: 'step.2.paid-courses.1' },
-    ]);
-  },
-  "step.2.paid-courses.1": (chatId) => {
-    bot.sendMessage(chatId, `
-    Авторский курс Анны Клименкоди - это практика использования актуальных нейросетей в профессиональной деятельности дизайнеров и стилистов. Курс включает инструкции по работе с инструментами искусственного интеллекта с учетом последних обновлений, и доступен для обучения с “нуля”.
+const introductionMessage = `Как я могу к Вам обращаться?`;
 
-    Профессия: контент менеджер, промпт инженер
 
-    Доступно полностью дистанционное (онлайн) обучение
 
-    Длительность: 12 недель, 72 академических часа
-    Полная стоимость курса: 50 тыс. рублей, доступна рассрочка
+// const welcomeMessage = `Здравствуйте. Я бот Высшей школы стилистики, дизайна и технологий! Я готов предоставить вам информацию о наших курсах и вариантах обучения. Также я могу перевести вас на другого бота, где вы можете бесплатно проходить обучение.`;
 
-    Подробнее: https://styleschool.ru/education/nn-for-designers-and-stylists
-`);
-    sendMessageWithOptions(chatId, 'Хотите начать обучение по этой программе?', [
-      { text: 'Да', callback_data: 'block.2' },
-      { text: 'Нет', callback_data: 'step.1' },
-      { text: 'Выбрать другой курс', callback_data: 'step.2.paid-courses' },
-    ]);
-  },
-  "step.3": (chatId) => {
-    sendMessageWithOptions(chatId, 'Выберите бесплатный курс:', [
-      { text: '1. КОНСУЛЬТАНТ ПО СТИЛЮ', callback_data: 'step.3.free-courses.1' },
-    ]);
-  },
-  "step.3.free-courses.1": (chatId) => {
-    bot.sendMessage(chatId, `
-    Курс создан для обучения с “нуля”. Дает возможность реализовать мечту о творческой самореализации в области моды и сделать первые шаги в профессии стилиста. В курсе представлены базовые методики в области подбора комплектов одежды в соответствии с индивидуальными особенностями персон и модными тенденциями. Гибкий график изучения видео материалов в сочетании с живыми практическими занятиями и командной работой дает гарантированный результат.
+// const steps = {
+//   "step.1": (chatId) => {
+//     sendMessageWithOptions(chatId, 'Как я могу быть вам полезен?', [
+//       { text: 'Информация о курсах', callback_data: 'step.2' },
+//       { text: 'Оставить заявку для связи', callback_data: 'block.2' },
+//       { text: 'Хочу учиться бесплатно!', callback_data: 'step.3' }
+//     ]);
+//   },
+//   "step.2": (chatId) => {
+//     sendMessageWithOptions(chatId, 'У нас есть следующие варианты обучения:', [
+//       { text: 'Платные программы', callback_data: 'step.2.paid-courses' },
+//       { text: 'Бесплатные программы', callback_data: 'step.3' },
+//       { text: 'Назад', callback_data: 'step.1' },
+//       { text: 'Бесплатные в рамках программы Содействие занятости', callback_data: 'step.4' },
+//     ]);
+//   },
+//   "step.2.paid-courses": (chatId) => {
+//     sendMessageWithOptions(chatId, 'Выберите платный курс:', [
+//       { text: '1. НЕЙРОСЕТИ ДЛЯ ДИЗАЙНЕРОВ И СТИЛИСТОВ', callback_data: 'step.2.paid-courses.1' },
+//     ]);
+//   },
+//   "step.2.paid-courses.1": (chatId) => {
+//     bot.sendMessage(chatId, `
+//     Авторский курс Анны Клименкоди - это практика использования актуальных нейросетей в профессиональной деятельности дизайнеров и стилистов. Курс включает инструкции по работе с инструментами искусственного интеллекта с учетом последних обновлений, и доступен для обучения с “нуля”.
 
-    Направления в профессии: имидж-консультант, консультант по стилю, персональный стилист, шопер, продавец-стилист.
+//     Профессия: контент менеджер, промпт инженер
 
-    Доступно полностью дистанционное (онлайн) обучение
-    Доступно комбинированное обучение с очными практиками
+//     Доступно полностью дистанционное (онлайн) обучение
 
-    Длительность: 8 недель, 144 академических часов.
-    Полная стоимость курса:
-    онлайн формат - 40 тыс. рублей, доступна рассрочка
-    комбинированный формат (онлайн + очные практики) - 69 тыс. рублей, доступна рассрочка *
-    cтоимость обучения в рамках федерального проекта “Содействие занятости” - 0 рублей. **
+//     Длительность: 12 недель, 72 академических часа
+//     Полная стоимость курса: 50 тыс. рублей, доступна рассрочка
 
-    * Очные практики доступны по региону: Москва, Новосибирск
-    ** Данное обучение доступно для определенных категорий граждан РФ.
-`);
-    sendMessageWithOptions(chatId, 'Хотите начать обучение по этой программе?', [
-      { text: 'Да', callback_data: 'block.2' },
-      { text: 'Нет', callback_data: 'step.1' },
-      { text: 'Выбрать другой курс', callback_data: 'step.3' },
-    ]);
-  },
-  "block.2": async (chatId, userId) => {
-    if (!userId) {
-      return;
-    }
+//     Подробнее: https://styleschool.ru/education/nn-for-designers-and-stylists
+// `);
+//     sendMessageWithOptions(chatId, 'Хотите начать обучение по этой программе?', [
+//       { text: 'Да', callback_data: 'block.2' },
+//       { text: 'Нет', callback_data: 'step.1' },
+//       { text: 'Выбрать другой курс', callback_data: 'step.2.paid-courses' },
+//     ]);
+//   },
+//   "step.3": (chatId) => {
+//     sendMessageWithOptions(chatId, 'Выберите бесплатный курс:', [
+//       { text: '1. КОНСУЛЬТАНТ ПО СТИЛЮ', callback_data: 'step.3.free-courses.1' },
+//     ]);
+//   },
+//   "step.3.free-courses.1": (chatId) => {
+//     bot.sendMessage(chatId, `
+//     Курс создан для обучения с “нуля”. Дает возможность реализовать мечту о творческой самореализации в области моды и сделать первые шаги в профессии стилиста. В курсе представлены базовые методики в области подбора комплектов одежды в соответствии с индивидуальными особенностями персон и модными тенденциями. Гибкий график изучения видео материалов в сочетании с живыми практическими занятиями и командной работой дает гарантированный результат.
 
-    const user = await getRow(userId);
-    console.log({ user });
+//     Направления в профессии: имидж-консультант, консультант по стилю, персональный стилист, шопер, продавец-стилист.
 
-    if (user?.fullName) {
-      sendMessageWithOptions(chatId, `Вы ${user.fullName}?`, [
-        { text: 'Да', callback_data: 'block.2.form-complete' },
-        { text: 'Нет', callback_data: 'block.2.enter-name' },
-      ]);
-    } else {
-      bot.sendMessage(chatId, `Как к вам обращаться?`);
-      chats[chatId] ??= {};
-      chats[chatId].state = 'entering-name';
-    }
-  },
-  "block.2.form-complete": (chatId) => {
-    bot.sendMessage(chatId, `Спасибо! В ближайшее время с Вами свяжутся`);
-  },
-  "block.2.enter-name": (chatId) => {
-    bot.sendMessage(chatId, `Как к вам обращаться?`);
-    chats[chatId] ??= {};
-    chats[chatId].state = 'entering-name';
-  },
-};
+//     Доступно полностью дистанционное (онлайн) обучение
+//     Доступно комбинированное обучение с очными практиками
+
+//     Длительность: 8 недель, 144 академических часов.
+//     Полная стоимость курса:
+//     онлайн формат - 40 тыс. рублей, доступна рассрочка
+//     комбинированный формат (онлайн + очные практики) - 69 тыс. рублей, доступна рассрочка *
+//     cтоимость обучения в рамках федерального проекта “Содействие занятости” - 0 рублей. **
+
+//     * Очные практики доступны по региону: Москва, Новосибирск
+//     ** Данное обучение доступно для определенных категорий граждан РФ.
+// `);
+//     sendMessageWithOptions(chatId, 'Хотите начать обучение по этой программе?', [
+//       { text: 'Да', callback_data: 'block.2' },
+//       { text: 'Нет', callback_data: 'step.1' },
+//       { text: 'Выбрать другой курс', callback_data: 'step.3' },
+//     ]);
+//   },
+//   "block.2": async (chatId, userId) => {
+//     if (!userId) {
+//       return;
+//     }
+
+//     const user = await getRow(userId);
+//     console.log({ user });
+
+//     if (user?.fullName) {
+//       sendMessageWithOptions(chatId, `Вы ${user.fullName}?`, [
+//         { text: 'Да', callback_data: 'block.2.form-complete' },
+//         { text: 'Нет', callback_data: 'block.2.enter-name' },
+//       ]);
+//     } else {
+//       bot.sendMessage(chatId, `Как к вам обращаться?`);
+//       chats[chatId] ??= {};
+//       chats[chatId].state = 'entering-name';
+//     }
+//   },
+//   "block.2.form-complete": (chatId) => {
+//     bot.sendMessage(chatId, `Спасибо! В ближайшее время с Вами свяжутся`);
+//   },
+//   "block.2.enter-name": (chatId) => {
+//     bot.sendMessage(chatId, `Как к вам обращаться?`);
+//     chats[chatId] ??= {};
+//     chats[chatId].state = 'entering-name';
+//   },
+// };
 
 // Matches any message
 bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
+    const username = msg.from.username;
     const text = msg.text;
 
-    if (chats?.[chatId]?.state === 'entering-name') {
-      await updateOrAddRow({ userId, fullName: text });
-      bot.sendMessage(chatId, `Спасибо! В ближайшее время с Вами свяжутся`);
-      delete chats?.[chatId]?.state;
-    }
+    // if (chats?.[chatId]?.state === 'entering-name') {
+    //   await updateOrAddRow({ userId, fullName: text });
+    //   bot.sendMessage(chatId, `Спасибо! В ближайшее время с Вами свяжутся`);
+    //   delete chats?.[chatId]?.state;
+    // }
 });
 
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
+  const username = msg.from.username;
+  console.log(username);
   bot.sendMessage(chatId, welcomeMessage).then(() => {
-    steps['step.1'](chatId);
+    // steps['step.1'](chatId);
   });
 });
 
 bot.on('callback_query', async (callbackQuery) => {
   const message = callbackQuery.message;
   const data = callbackQuery.data;
-  const handler = steps[data];
-  if (handler) {
-    await handler(message.chat.id, callbackQuery.from.id);
-  }
+  const username = callbackQuery.from.username;
+  // const handler = steps[data];
+  // if (handler) {
+  //   await handler(message.chat.id, callbackQuery.from.id);
+  // }
 });
 
 console.log("Bot is running...");
