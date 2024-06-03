@@ -396,11 +396,11 @@ async function applyMigrations() {
     if (values[0].length < 3 || values[0][1] !== 'userName' || values[0][2] !== 'fullName') {
       const responseAll = await sheets.spreadsheets.values.get({
         spreadsheetId,
-        range: 'Users!A1:C',
+        range: 'Users!A1:B',
       });
 
       const allValues = responseAll.data.values;
-      const newValues = allValues.map(row => [
+      const newValues = allValues.map((row, index) => [
         row[0] || null, // userId
         null, // userName (new field left empty)
         row[1] || null, // fullName moved to the third column
@@ -415,14 +415,26 @@ async function applyMigrations() {
         },
       });
 
-      await sheets.spreadsheets.values.update({
-        spreadsheetId,
-        range: 'Users!A2:C',
-        valueInputOption: 'RAW',
-        resource: {
-          values: newValues.slice(1), // exclude header row
-        },
-      });
+      if (newValues.length > 1) { // Ensure there's data beyond the header row
+        await sheets.spreadsheets.values.update({
+          spreadsheetId,
+          range: 'Users!A2:C',
+          valueInputOption: 'RAW',
+          resource: {
+            values: newValues.slice(1), // exclude header row
+          },
+        });
+
+        // Clear the old "fullName" column (second column)
+        await sheets.spreadsheets.values.update({
+          spreadsheetId,
+          range: 'Users!B2:B',
+          valueInputOption: 'RAW',
+          resource: {
+            values: Array(newValues.length - 1).fill([null]),
+          },
+        });
+      }
 
       console.log('Second migration applied, moved "fullName" to new position and added "userName" field.');
     } else {
