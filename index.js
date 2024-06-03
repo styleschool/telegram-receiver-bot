@@ -138,7 +138,7 @@ bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
   const username = msg.from.username;
   console.log(username);
-  bot.sendMessage(chatId, welcomeMessage).then(() => {
+  bot.sendMessage(chatId, introductionMessage).then(() => {
     // steps['step.1'](chatId);
   });
 });
